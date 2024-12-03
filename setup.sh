@@ -55,20 +55,29 @@ function check_for_python {
 
 
 
-function check_environment { 
-    if [ ! -d "$ENV_DIR" ]; then 
-		echo "Creating virtual environment..." 
-		sudo python3 -m venv $ENV_DIR 
-		echo "Virtual environment created!" 
-	else 
-		echo "Virtual environment already exists." 
-	fi 
-	echo "Activating virtual environment..." 
-	source $ENV_DIR/bin/activate 
-	echo "Checking and installing required packages..." 
-	sudo $ENV_DIR/bin/pip install pyinstaller selenium 
-	echo "Required packages are installed!" 
+function check_environment {
+    # Check if the virtual environment directory exists
+    if [ ! -d "$ENV_DIR" ]; then
+        echo "Creating virtual environment..."
+        python3 -m venv $ENV_DIR
+        echo "Virtual environment created!"
+    else
+        echo "Virtual environment already exists."
+    fi
+
+    echo "Activating virtual environment..."
+    source $ENV_DIR/bin/activate
+
+    # Check if required packages are installed
+    if ! pip show pyinstaller &> /dev/null || ! pip show selenium &> /dev/null; then
+        echo "Required packages are not fully installed. Installing them..."
+        pip install pyinstaller selenium
+        echo "Required packages are installed!"
+    else
+        echo "Required packages are already installed."
+    fi
 }
+
 
 function install_app {
     echo "Installing the application..."
