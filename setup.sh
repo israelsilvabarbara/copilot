@@ -86,7 +86,7 @@ function install_app {
 
     echo "Checking for Python"
     check_for_python
-    
+
     check_environment
 
     echo "Creating venv..."  
@@ -123,7 +123,7 @@ function uninstall_app {
     # Remove the icon 
     sudo rm $PATH_TO_ICONS/$ICON_NAME 
     # Remove the .desktop file 
-    sudo rm $PATH_TO_DESKTOP/$DESKTOP_FILE 
+    sudo rm $PATH_TO_DESKTOP/$DESKTOP_NAME
     
     # Remove the data folder
     sudo rm -r $PATH_TO_DATA
