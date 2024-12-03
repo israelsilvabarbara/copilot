@@ -29,23 +29,27 @@ function show_help {
 }
 
 function check_chromedriver { 
-    if ! command -v chromedriver &> /dev/null 
-    then 
-        echo "#chromedriver could not be found. Installing it..." 
-        sudo apt-get install chromium-chromedriver 
-    else 
-        echo "#chromedriver is already installed." 
+    if ! which chromedriver &> /dev/null; then
+        echo "#chromedriver could not be found. Installing it..."
+        sudo apt-get install chromium-chromedriver
+    else
+        echo "#chromedriver is already installed."
     fi
 }
 
 function check_for_python {
-    if ! command -v python3 &> /dev/null
-    then
-        echo "Python3 could not be found. Installing it..."
-        sudo apt-get update
-        sudo apt-get install -y python3 python3-venv
+    if dpkg -l | grep -q "python3.*"; then
+        echo "Python 3 packages are already installed."
     else
-        echo "Python3 is already installed."
+        echo "Python 3 packages are not installed. Installing Python 3 and python3-venv..."
+        sudo apt-get install -y python3 python3-venv
+    fi
+
+    if dpkg -l | grep -q "python.*-venv"; then
+        echo "python-venv package is already installed."
+    else
+        echo "python-venv package is not installed. Installing it..."
+        sudo apt-get install -y python3-venv
     fi
 }
 
@@ -68,7 +72,8 @@ function check_environment {
 
 function install_app {
     echo "Installing the application..."
-    
+    sudo apt-get update
+
     echo "Checking for drivers..."
     # Check if chromedriver is installed
     check_chromedriver
