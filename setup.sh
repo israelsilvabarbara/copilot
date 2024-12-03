@@ -38,6 +38,18 @@ function check_chromedriver {
     fi
 }
 
+function check_for_python {
+    if ! command -v python3 &> /dev/null
+    then
+        echo "Python3 could not be found. Installing it..."
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-venv
+    else
+        echo "Python3 is already installed."
+    fi
+}
+
+
 
 function check_environment { 
     if [ ! -d "$ENV_DIR" ]; then 
@@ -72,6 +84,9 @@ function install_app {
     sudo chmod -R u+w $DATA_DIR
     sudo chown -R $USER:$USER $DATA_DIR
 
+    echo "Checking for Python"
+    check_for_python
+    
     check_environment
 
     echo "Creating venv..."  
