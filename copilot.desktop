@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Name=copilot
+Exec=copilot
+Icon=/usr/share/icons/copilot/copilot.svg
+Type=Application
+Categories=Utility;
