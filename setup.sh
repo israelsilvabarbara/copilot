@@ -56,8 +56,8 @@ function check_for_python {
 
 
 function check_environment {
-    # Check if the virtual environment directory exists
-    if [ ! -d "$ENV_DIR" ]; then
+    # Check if the virtual environment directory and bin/activate file exist
+    if [ ! -f "$ENV_DIR/bin/activate" ]; then
         echo "Creating virtual environment..."
         python3 -m venv $ENV_DIR
         echo "Virtual environment created!"
