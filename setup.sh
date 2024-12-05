@@ -131,7 +131,8 @@ function install_app {
 
 function uninstall_app {
     echo "Uninstalling the application..."
-
+    
+    set +e
     # Remove the executable 
     sudo rm $PATH_TO_BIN/$APP_NAME 
     # Remove the icon 
@@ -140,7 +141,8 @@ function uninstall_app {
     sudo rm $PATH_TO_DESKTOP/$DESKTOP_NAME
     
     # Remove the data folder
-    sudo rm -r $PATH_TO_DATA
+    sudo rm -r $DATA_DIR
+    set -e
     
     echo "Uninstallation complete!"
 }
