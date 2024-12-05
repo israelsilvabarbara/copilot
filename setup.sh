@@ -25,10 +25,13 @@ function show_help {
     echo "   uninstall     Uninstall the application"
     echo "   clean         Remove the virtual environment"
     echo "   chrome-setup  Check and install ChromeDriver if necessary"
+    echo "   set-snap      Create directories and set files in place (gen bin if necessary)"
     echo "   --help        Display this help message"
 }
 
 function check_chromedriver { 
+    echo "Checking for drivers..."
+    # Check if chromedriver is installed
     if ! which chromedriver &> /dev/null; then
         echo "#chromedriver could not be found. Installing it..."
         sudo apt-get install chromium-chromedriver
@@ -53,7 +56,80 @@ function check_for_python {
     fi
 }
 
+# Function to set up the Snap directory structure
+function set_snap() {
+    # Define the base path for the Snap structure
+    SNAP_BASE="snap"
 
+    # Check if the binary exists 
+    if [ -f "dist/copilot_launcher" ]; then 
+        echo "Binary found, proceeding with setup..." 
+    else 
+        # Prompt the user 
+        echo "Binary not found in /dist/copilot_launcher." 
+        read -p "Do you want to create the binary? (yes/no): " response 
+        if [ "$response" = "yes" ]; then 
+            create_directories
+            generate_bin 
+        else 
+            echo "Aborting setup." 
+            exit 1 
+        fi
+    fi
+
+    # Create directories if they don't already exist
+    mkdir -p "$SNAP_BASE/bin"
+    mkdir -p "$SNAP_BASE/meta/gui"
+    mkdir -p "$SNAP_BASE/meta/icons"
+
+    # Copy files into their respective directories
+    cp copilot_launcher.py "$SNAP_BASE/bin/"
+    cp copilot.desktop "$SNAP_BASE/meta/gui/"
+    cp copilot.svg "$SNAP_BASE/meta/icons/"
+
+    echo "Snap directory structure has been set up successfully."
+}
+
+
+
+function create_directories(){
+
+    echo "Creating directories with sudo..."
+
+    sed +e
+    sudo mkdir -p $DATA_DIR
+    sudo mkdir -p $SELENIUM_DIR
+    sudo mkdir -p $ENV_DIR
+    sudo mkdir -p $LOG_DIR
+    sudo mkdir -p $PATH_TO_ICONS
+    # Ensure directories have the correct permissions
+    sudo chmod -R u+w $DATA_DIR
+    sudo chown -R $USER:$USER $DATA_DIR
+    sed -e
+}
+
+function generate_bin(){
+
+    echo "Checking for Python"
+    check_for_python
+
+    check_environment
+
+    echo "Creating venv..."  
+    # Step 1: Create the environment for Python
+    sudo python3 -m venv $ENV_DIR
+
+    # Step 2: Activate the environment and install PyInstaller
+    echo "Installing pyinstaller..."
+    source $ENV_DIR/bin/activate
+    sudo $ENV_DIR/bin/pip install pyinstaller selenium
+
+    # Get the full path to the pyinstaller executable 
+    PYINSTALLER_PATH=$(which pyinstaller)
+    echo "Building the executable from $SCRIPT_NAME..." 
+    $PYINSTALLER_PATH --onefile $SCRIPT_NAME
+
+}
 
 function check_environment {
     # Check if the virtual environment directory and bin/activate file exist
@@ -83,39 +159,11 @@ function install_app {
     echo "Installing the application..."
     sudo apt-get update
 
-    echo "Checking for drivers..."
-    # Check if chromedriver is installed
     check_chromedriver
 
-    echo "Creating directories with sudo..."
-    # Ensure directories have the correct permissions
-    sudo mkdir -p $DATA_DIR
-    sudo mkdir -p $SELENIUM_DIR
-    sudo mkdir -p $ENV_DIR
-    sudo mkdir -p $LOG_DIR
-    sudo mkdir -p $PATH_TO_ICONS
-    
-    sudo chmod -R u+w $DATA_DIR
-    sudo chown -R $USER:$USER $DATA_DIR
+    create_directories
 
-    echo "Checking for Python"
-    check_for_python
-
-    check_environment
-
-    echo "Creating venv..."  
-    # Step 1: Create the environment for Python
-    sudo python3 -m venv $ENV_DIR
-
-    # Step 2: Activate the environment and install PyInstaller
-    echo "Installing pyinstaller..."
-    source $ENV_DIR/bin/activate
-    sudo $ENV_DIR/bin/pip install pyinstaller selenium
-
-    # Get the full path to the pyinstaller executable 
-    PYINSTALLER_PATH=$(which pyinstaller)
-    echo "Building the executable from $SCRIPT_NAME..." 
-    $PYINSTALLER_PATH --onefile $SCRIPT_NAME
+    generate_bin
 
     # Step 4: Copy the .desktop file, executable, and icon to the appropriate directories
     echo "Copying files into destination..."
@@ -165,6 +213,9 @@ case "$1" in
         ;;
     chrome-setup)
         check_chromedriver
+        ;;
+    set-snap)
+        set_snap
         ;;
     --help)
         show_help
