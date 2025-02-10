@@ -115,8 +115,8 @@ function install_app {
     # Get the full path to the pyinstaller executable 
     PYINSTALLER_PATH=$(which pyinstaller)
     echo "Building the executable from $SCRIPT_NAME..." 
-    $PYINSTALLER_PATH --onefile $SCRIPT_NAME
-
+   #$PYINSTALLER_PATH --onefile $SCRIPT_NAME
+    $PYINSTALLER_PATH --onefile --icon=copilot.png $SCRIPT_NAME
     # Step 4: Copy the .desktop file, executable, and icon to the appropriate directories
     echo "Copying files into destination..."
     sudo cp dist/$BIN_NAME $PATH_TO_BIN/$APP_NAME
