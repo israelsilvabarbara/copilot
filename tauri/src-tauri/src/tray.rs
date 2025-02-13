@@ -2,6 +2,7 @@ use tauri::{
     menu::{MenuBuilder, MenuItem}, Manager, Runtime
 };
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+use tauri_plugin_positioner::WindowExt;
 
 
 use crate::position::WindowPosition;
@@ -10,7 +11,7 @@ use crate::position::WindowPosition;
 #[allow(dead_code)]
 pub fn create_tray<R: Runtime>( app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     let copilot_item   = MenuItem::with_id(app, "copilot",   "Copilot",   false, None::<&str>)?;
-    let show_hide_item = MenuItem::with_id(app, "show_hide", "Show/Hide", true,  None::<&str>)?;
+    let show_hide_item = MenuItem::with_id(app, "show_hide", "Hide",      true,  None::<&str>)?;
     let quit_item      = MenuItem::with_id(app, "quit",      "Quit",      true,  None::<&str>)?;
     
     let menu = MenuBuilder::new(app)
@@ -29,51 +30,28 @@ pub fn create_tray<R: Runtime>( app: &tauri::AppHandle<R>) -> tauri::Result<()> 
                 app.exit(0);
             }
             "show_hide" => {
+                //tauri_plugin_positioner::on_tray_event(app.app_handle(), &event);
                 if let Some(window) = app.get_webview_window("main") {
                     if window.is_visible().unwrap_or(false) {
-                        // Save the current position before hiding
-                        if let Ok(position) = window.outer_position() {
-                            app.state::<WindowPosition>().set(Some(position));
+                        if let Some(item) = menu.get(&event.id) {
+                            let _ = item.as_menuitem().and_then(|item| Some(item.set_text("Show")));
                         }
                         let _ = window.hide();
-                        println!("hide");
                     } else {
-                        // Restore the saved position when showing
-                        if let Some(position) = app.state::<WindowPosition>().get() {
-                            let _ = window.set_position(position);
+                        // Change the menu item text to "Hide"
+                        if let Some(item) = menu.get(&event.id) {
+                            let _ = item.as_menuitem().and_then(|item| Some(item.set_text("Hide")));
                         }
-                        let _ = window.show();
+                        let _ = window.move_window(tauri_plugin_positioner::Position::TopRight);
+                        let _ = window.set_always_on_top(true);
                         let _ = window.set_focus();
-                        println!("show");
+                        let _ = window.show();
                     }
                 }
             }
+            
             _ => {}
-        })
-        .on_tray_icon_event( |tray, event| {
-            println!("event: {:#?}", event);
-            if let TrayIconEvent::Click {
-                button: MouseButton::Left,
-                button_state: MouseButtonState::Up,
-                ..
-            } = event
-            {
-                let app = tray.app_handle();
-                if let Some(window) = app.get_webview_window("main") {
-                    if  !window.is_visible().unwrap_or(false) {
-                        let _ = window.show();
-                        let _ = window.set_focus();
-                        println!("show");
-                    } else {
-                        let _ = window.hide();
-                        println!("hide");
-                    }
-                }
-            }
         })
         .build(app);
     Ok(())
 }
-
-
-

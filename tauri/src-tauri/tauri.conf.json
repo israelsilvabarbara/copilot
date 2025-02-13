@@ -28,11 +28,16 @@
       {
         "label": "main",
         "url": "https://copilot.microsoft.com",
+        "alwaysOnTop": true,
+        "center": false,
+        "closable": false,
+        "focus":false,
+        "decorations": false,
         "fullscreen": false,
-        "height": 600,
         "resizable": true,
-        "title": "Tauri App",
-        "width": 800
+        "width": 400,
+        "height": 600,
+        "skipTaskbar": true
       }
     ],
     "withGlobalTauri": false
