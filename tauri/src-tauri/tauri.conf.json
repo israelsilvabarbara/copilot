@@ -46,11 +46,11 @@
     "active": true,
     "targets": "all",
     "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
+      "icons/copilot_32_color.png",
+      "icons/copilot_32_white.png",
+      "icons/copilot_32_black.png",
+      "icons/copilot_50_black.png"
+
     ]
   }
 }

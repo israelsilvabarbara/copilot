@@ -1,5 +1,3 @@
-use std::{thread, time::Duration};
-
 use tauri::Manager;
 use tauri_plugin_positioner::{Position, WindowExt};
 

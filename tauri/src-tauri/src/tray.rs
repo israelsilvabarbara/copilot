@@ -1,11 +1,11 @@
 use tauri::{
-    menu::{MenuBuilder, MenuItem}, Manager, Runtime
+    menu::{MenuBuilder, MenuItem},
+    tray::TrayIconBuilder,
+    Manager, 
+    Runtime,
 };
-use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri_plugin_positioner::WindowExt;
 
-
-use crate::position::WindowPosition;
 
 
 #[allow(dead_code)]
